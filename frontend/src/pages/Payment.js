@@ -224,7 +224,7 @@ const Payment = () => {
       if (responseData.success) {
         payment(
           responseData.order._id,
-          totalPrice,
+          (isCouponApplied ? totalPrice * 0.9 : totalPrice) + selectedShippingMethod.price -shippingDiscount,
           orderData.products,
           orderCode
         );
