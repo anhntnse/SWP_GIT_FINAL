@@ -1,0 +1,53 @@
+
+.customShadow{
+    box-shadow: 0px 0px 10px rgba(0,0,0,0.1) !important;
+}
+
+/***user table***/
+.userTable{
+    @apply bg-white
+}
+.userTable th{
+    @apply border text-base font-medium
+}
+
+.userTable td{
+    @apply border text-base text-center
+}
+body {
+    background-color: #F1F5F9 !important;
+}
+/**scrollbar hidden****/
+.scrollbar-none::-webkit-scrollbar{
+    display: none !important;
+}
+.bg-white {
+    background-color: #F5F2F7 !important;
+}
+
+.form input {
+    background-color: #FAFBFC !important;
+    border: "1px solid"!important;
+    border-color: #D6D8DE !important
+}
+/* Modal container */
+.modal {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: #f9f9f9;
+    padding: 25px;
+    width: 350px; /* Độ rộng cố định */
+    border-radius: 10px;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+    z-index: 1000; /* Đảm bảo modal hiển thị trên các phần tử khác */
+    font-family: Arial, sans-serif;
+}
+
+.text-center {
+    text-align: center;
+}
