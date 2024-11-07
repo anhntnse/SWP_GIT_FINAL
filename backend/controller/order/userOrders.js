@@ -15,6 +15,8 @@ async function userOrders(req, res) {
         const userOrders = await orderModel.find({ userId });
 
         if (userOrders.length === 0) {
+            console.log("not found here")
+
             return res.status(404).json({
                 message: "No orders found for this user",
                 success: false,

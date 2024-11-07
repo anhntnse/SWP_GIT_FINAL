@@ -13,7 +13,9 @@ const createOrder = async (req, res) => {
       totalPrice: totalPrice,
       shipping_address:  shipping_address,
       orderCode: orderCode,
-      status: status || 'pending' // Mặc định là 'pending' nếu không truyền vào
+      status: status || 'pending', // Mặc định là 'pending' nếu không truyền vào
+      order_status: 'pending' // Mặc định là 'pending' nếu không truyền vào
+
     });
 
     // Lưu đơn hàng mới vào database

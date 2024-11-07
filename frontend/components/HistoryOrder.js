@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import SummaryApi from "../common";
 import { toast } from "react-toastify";
 import moment from "moment";
+import OrderDetail from "./OrderDetail"; // Import the OrderDetail component
 
 const HistoryOrder = ({ userId }) => {
   const styles = {
@@ -14,18 +15,13 @@ const HistoryOrder = ({ userId }) => {
       fontWeight: "bold",
       color: "white",
     },
-    icon: {
-      marginRight: "5px",
-    },
-    success: {
-      backgroundColor: "#28a745" /* Green */,
-    },
-    pending: {
-      backgroundColor: "#ffc107" /* Yellow */,
-    },
+    icon: { marginRight: "5px" },
+    success: { backgroundColor: "#28a745" },
+    pending: { backgroundColor: "#ffc107" },
   };
 
   const [userOrders, setUserOrders] = useState([]);
+  const [selectedOrderId, setSelectedOrderId] = useState(null); // Track the selected order
 
   const fetchUserOrders = async () => {
     try {
@@ -33,12 +29,11 @@ const HistoryOrder = ({ userId }) => {
         method: SummaryApi.userOrder.method,
         credentials: "include",
       });
-
       const dataResponse = await fetchData.json();
 
       if (dataResponse.success) {
         setUserOrders(dataResponse.data);
-      } else if (dataResponse.error) {
+      } else {
         toast.error(dataResponse.message);
       }
     } catch (error) {
@@ -51,8 +46,17 @@ const HistoryOrder = ({ userId }) => {
     if (userId) {
       fetchUserOrders();
     }
-    console.log(userOrders);
   }, [userId]);
+
+  // Show OrderDetail if an order is selected
+  if (selectedOrderId) {
+    return (
+      <OrderDetail 
+        orderId={selectedOrderId} 
+        onBack={() => setSelectedOrderId(null)} // Pass a callback to go back to the order list
+      />
+    );
+  }
 
   return (
     <div className="bg-white pb-4">
@@ -63,13 +67,18 @@ const HistoryOrder = ({ userId }) => {
             <th>Product</th>
             <th>Shipping Address</th>
             <th>Total Price</th>
-            <th>Status</th>
+            <th>Payment Status</th>
+            <th>Order Status</th>
             <th>Created Date</th>
           </tr>
         </thead>
         <tbody>
           {userOrders.map((el, index) => (
-            <tr key={index}>
+            <tr
+              key={index}
+              onClick={() => setSelectedOrderId(el._id)} // Set selected order ID on click
+              style={{ cursor: "pointer" }}
+            >
               <td>{index + 1}</td>
               <td>
                 {el?.products && el.products.length > 0 ? (
@@ -85,15 +94,12 @@ const HistoryOrder = ({ userId }) => {
                   <div>
                     <p>{el.shipping_address.email}</p>
                     <p>
-                      {el.shipping_address.firstName}{" "}
-                      {el.shipping_address.lastName}
+                      {el.shipping_address.firstName} {el.shipping_address.lastName}
                     </p>
                     <p>{el.shipping_address.address}</p>
                     <p>
-                      {el.shipping_address.city},{" "}
-                      {el.shipping_address.postalCode}
+                      {el.shipping_address.city}, {el.shipping_address.postalCode}
                     </p>
-                    {/* If 'phone' field is available */}
                     {el.shipping_address.phone ? (
                       <p>{el.shipping_address.phone}</p>
                     ) : (
@@ -122,7 +128,20 @@ const HistoryOrder = ({ userId }) => {
                   {el.status === "Payment successful" ? "Success" : "Pending"}
                 </span>
               </td>
-
+              <td className="text-center">
+                <span
+                  style={{
+                    ...styles.statusTag,
+                    ...(el.order_status === "Delivered"
+                      ? styles.success
+                      : el.order_status === "Cancelled"
+                      ? styles.cancelled
+                      : styles.pending),
+                  }}
+                >
+                  {el.order_status || "Pending"}
+                </span>
+              </td>
               <td>{moment(el?.createdAt).format("LL")}</td>
             </tr>
           ))}

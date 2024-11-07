@@ -16,6 +16,9 @@ import AllOrders from '../pages/AllOrders'
 import UserPanel from '../pages/UserPanel'
 import ChangePassword from '../components/ChangePassword'
 import PaymentSuccess from  '../pages/PaymentSuccess'
+import AllShippingMethods from '../pages/AllShippingMethods'
+import Inventory from '../pages/Inventory'
+import RevenueSummary from '../pages/RevenueSummary'
 
 const router = createBrowserRouter([
     {
@@ -70,6 +73,18 @@ const router = createBrowserRouter([
                         path: "all-orders",
                         element : <AllOrders/>
                     },
+                    {   path: "all-shipping-methods",
+                        element: <AllShippingMethods/>
+                    },
+                    {
+                        path : "inventory-management",
+                        element : <Inventory/>
+                    },
+                    {
+                        path : "revenue-summary",
+                        element: <RevenueSummary/>
+                    }
+                
                 ]
             },
             {

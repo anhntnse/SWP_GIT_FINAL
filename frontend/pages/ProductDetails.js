@@ -196,6 +196,8 @@ const ProductDetails = () => {
                     <FaStar/>
                     <FaStar/>
                     <FaStarHalf/>
+                    <p className='text-gray-500 text-md'>Sold: {data.sold_quantity}</p>
+
                 </div>
 
                 <div className='flex items-center gap-2 text-2xl lg:text-3xl font-medium my-1'>

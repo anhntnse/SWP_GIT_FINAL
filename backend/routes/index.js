@@ -34,7 +34,10 @@ const addShippingMethod = require('../controller/shipping/addShippingMethod');
 const allShippingMethods = require('../controller/shipping/allShippingMethods');
 const updateShippingMethod = require('../controller/shipping/updateShippingMethod');
 const deleteShippingMethod = require('../controller/shipping/deleteShippingMethod');
-
+const updateOrderStatus  = require('../controller/order/updateOrderStatus');
+const updateStockQuantity = require('../controller/product/updateStockQuantity');
+const deleteProduct = require('../controller/product/deleteProduct')
+const revenueSummary = require('../controller/order/revenueSummary')
 
 router.post("/signup",userSignUpController)
 router.post("/signin",userSignInController)
@@ -89,5 +92,12 @@ router.post("/update-shipping-method", authToken, updateShippingMethod);
 
 // Route to delete a shipping method
 router.post("/delete-shipping-method/:id", authToken, deleteShippingMethod);
+
+router.post("/update-order-status",  authToken, updateOrderStatus);
+
+router.post("/update-stock-quantity", authToken, updateStockQuantity);
+router.post("/delete-product/:productId", authToken, deleteProduct);
+
+router.get('/revenue-summary/:period', revenueSummary); // 'weekly' or 'monthly'
 
 module.exports = router

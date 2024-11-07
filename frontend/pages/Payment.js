@@ -2,7 +2,8 @@ import React, { useContext, useEffect, useState } from "react";
 import SummaryApi from "../common";
 import Context from "../context";
 import displayINRCurrency from "../helpers/displayCurrency";
-import {useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 
 const Payment = () => {
   const [data, setData] = useState([]);
@@ -11,7 +12,11 @@ const Payment = () => {
   const [showCoupon, setShowCoupon] = useState(false);
   const [couponCode, setCouponCode] = useState("");
   const [isCouponApplied, setIsCouponApplied] = useState(false);
-  const navigate = useNavigate(); // Initialize useNavigate hook
+  const [shippingMethods, setShippingMethods] = useState([]); // New state for shipping methods
+  const [selectedShippingMethod, setSelectedShippingMethod] = useState(""); // State for selected method
+  const [shippingDiscount, setShippingDiscount] = useState(0);
+
+  const navigate = useNavigate();
 
   const styles = {
     pagetitle: {
@@ -93,6 +98,10 @@ const Payment = () => {
     phone: "",
   });
 
+  const location = useLocation();
+  const selectedProducts = location.state?.selectedProducts || [];
+
+  console.log("Selected Product from Cart    " + selectedProducts);
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
@@ -108,19 +117,57 @@ const Payment = () => {
 
     const responseData = await response.json();
     if (responseData.success) {
-      setData(responseData.data);
+      console.log("OK chua " + responseData.data); // Log the response data for debugging
+
+      // Assuming responseData.data is the array of products
+      const filteredProducts = responseData.data.filter((product) =>
+        selectedProducts.includes(product._id)
+      );
+
+      setData(filteredProducts); // Set the filtered products to your state
     }
+  };
+
+  const calculateShippingDiscount = () => {
+    if (!selectedShippingMethod || !selectedShippingMethod.price) return 0;
+
+    if (totalPrice > 500000) return selectedShippingMethod.price;
+    if (totalPrice >= 300000) return selectedShippingMethod.price * 0.5;
+    if (totalPrice >= 200000) return selectedShippingMethod.price * 0.25;
+    if (totalPrice > 100000) return selectedShippingMethod.price * 0.1;
+
+    return 0;
   };
 
   const handleLoading = async () => {
     await fetchData();
+    await fetchShippingMethods(); // Fetch shipping methods on load
+  };
+
+  const fetchShippingMethods = async () => {
+    try {
+      const response = await fetch(SummaryApi.allShippingMethods.url, {
+        method: SummaryApi.allShippingMethods.method,
+        credentials: "include",
+      });
+      const data = await response.json();
+
+      if (data.success) {
+        setShippingMethods(data.data);
+      } else {
+        toast.error(data.message);
+      }
+    } catch (error) {
+      toast.error("Failed to fetch shipping methods.");
+    }
   };
 
   useEffect(() => {
     setLoading(true);
+    setShippingDiscount(calculateShippingDiscount());
     handleLoading();
     setLoading(false);
-  }, []);
+  }, [selectedShippingMethod]);
 
   const totalPrice = data.reduce(
     (preve, curr) => preve + curr.quantity * curr?.productId?.sellingPrice,
@@ -128,8 +175,6 @@ const Payment = () => {
   );
 
   const createOrder = async () => {
-    console.log("--context:");
-    console.log(context);
     const userDetails = await context.fetchUserDetails();
     const orderCode = Number(String(Date.now()).slice(-6)); // Generate a unique order code
     console.log(data);
@@ -152,12 +197,16 @@ const Payment = () => {
         phone: formData.phone,
       },
       status: "pending",
-      totalPrice: isCouponApplied ? totalPrice * 0.9 : totalPrice,
+      totalPrice:
+        (isCouponApplied ? totalPrice * 0.9 : totalPrice) +
+        selectedShippingMethod.price -
+        shippingDiscount,
+      shippingMethod: selectedShippingMethod, // Add selected shipping method here
     };
-  
+
     try {
       console.log("Sending order data: ", orderData); // Log order data
-  
+
       const response = await fetch(SummaryApi.createOrder.url, {
         method: "POST",
         credentials: "include",
@@ -166,12 +215,17 @@ const Payment = () => {
         },
         body: JSON.stringify(orderData),
       });
-  
+
       const responseData = await response.json();
       console.log("Response data: ", responseData); // Log full response
-  
+
       if (responseData.success) {
-        payment(responseData.order._id, totalPrice, orderData.products, orderCode);
+        payment(
+          responseData.order._id,
+          totalPrice,
+          orderData.products,
+          orderCode
+        );
       } else {
         console.error("Order creation failed. Server response:", responseData);
         alert("Failed to create order. Please check the entered information.");
@@ -183,90 +237,87 @@ const Payment = () => {
   };
 
   // Payment function
-const payment = async (_id, totalPrice, products, orderCode) => {
-  // Prepare the data for the payment link
-  const items = products.map((product) => ({
-    name: String(product.productName), // Replace with actual product name if available
-    quantity: product.quantity,
-    price: product.price_per_item,
-  }));
+  const payment = async (_id, totalPrice, products, orderCode) => {
+    // Prepare the data for the payment link
+    const items = products.map((product) => ({
+      name: String(product.productName), // Replace with actual product name if available
+      quantity: product.quantity,
+      price: product.price_per_item,
+    }));
 
-  const body = {
-    orderCode: orderCode,
-    amount: totalPrice, // Total price calculated in createOrder
-    description: "Thanh toan don hang", // Payment description
-    items: items,
-    returnUrl: `http://localhost:3000/payment-success?_id=${_id}`, // Redirect URL after successful payment
-    cancelUrl: `http://localhost:3000/cancel.html`, // Redirect URL after canceled payment
+    const body = {
+      orderCode: orderCode,
+      amount: totalPrice, // Total price calculated in createOrder
+      description: "Thanh toan don hang", // Payment description
+      items: items,
+      returnUrl: `http://localhost:3000/payment-success?_id=${_id}`, // Redirect URL after successful payment
+      cancelUrl: `http://localhost:3000/cancel.html`, // Redirect URL after canceled payment
+    };
+
+    try {
+      console.log("Initiating payment with the following details:");
+      console.log("Total Price:", totalPrice);
+      console.log("Items:", items);
+
+      // Call the backend to create a payment link
+      const response = await fetch(SummaryApi.payment.url, {
+        method: "POST",
+        credentials: "include",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(body),
+      });
+      console.log("payment response: ");
+      console.log(response);
+      if (response.ok) {
+        const data = await response.json();
+        // Redirect the user to the payment link
+        deleteAllCartProducts(products);
+        window.location.href = data.url;
+      } else {
+        console.error("Error creating payment link:", response.statusText);
+        alert("Failed to initiate payment. Please try again.");
+      }
+    } catch (error) {
+      console.error("Payment error:", error);
+      alert("An error occurred while initiating payment. Please try again.");
+    }
   };
 
-  try {
-    console.log("Initiating payment with the following details:");
-    console.log("Total Price:", totalPrice);
-    console.log("Items:", items);
-
-    // Call the backend to create a payment link
-    const response = await fetch(SummaryApi.payment.url, {
-      method: "POST",
+  const deleteCartProduct = async (id) => {
+    console.log("deleteCartProduct " + id);
+    const response = await fetch(SummaryApi.deleteCartProduct.url, {
+      method: SummaryApi.deleteCartProduct.method,
       credentials: "include",
       headers: {
-        "Content-Type": "application/json",
+        "content-type": "application/json",
       },
-      body: JSON.stringify(body),
+      body: JSON.stringify({
+        _id: id,
+      }),
     });
-    console.log("payment response: ");
-    console.log(response);
-    if (response.ok) {
-      const data = await response.json();
-      // Redirect the user to the payment link
-      deleteAllCartProducts(products);
-      window.location.href = data.url;
-    } else {
-      console.error("Error creating payment link:", response.statusText);
-      alert("Failed to initiate payment. Please try again.");
+
+    const responseData = await response.json();
+
+    if (responseData.success) {
+      fetchData();
+      context.fetchUserAddToCart();
     }
-  } catch (error) {
-    console.error("Payment error:", error);
-    alert("An error occurred while initiating payment. Please try again.");
-  }
-};
+  };
 
-const deleteCartProduct = async (id) => {
-  console.log('deleteCartProduct '+id);
-  const response = await fetch(SummaryApi.deleteCartProduct.url, {
-    method: SummaryApi.deleteCartProduct.method,
-    credentials: "include",
-    headers: {
-      "content-type": "application/json",
-    },
-    body: JSON.stringify({
-      _id: id,
-    }),
-  });
-
-  const responseData = await response.json();
-
-  if (responseData.success) {
-    fetchData();
-    context.fetchUserAddToCart();
-  }
-};
-
-const deleteAllCartProducts = async (products) => {
-  console.log('deleteAllCartProducts');
-  console.log(products);
-  for (const product of products) {
+  const deleteAllCartProducts = async (products) => {
+    console.log("deleteAllCartProducts");
+    console.log(products);
+    for (const product of products) {
       console.log(product);
       await deleteCartProduct(product.product_id); // Assuming product_id is the ID used for deletion
-  }
-};
-
+    }
+  };
 
   useEffect(() => {
-    console.log('Context value:', context); // Log the context to check its contents
+    console.log("Context value:", context); // Log the context to check its contents
   }, [context]);
-  
-  
 
   const handleSubmit = (e) => {
     e.preventDefault(); // Prevent default form submission behavior
@@ -274,7 +325,8 @@ const deleteAllCartProducts = async (products) => {
     createOrder(); // Call createOrder function
   };
 
-  const handleCouponApply = async () => {
+  const handleCouponApply = async (e) => {
+    e.preventDefault();
     if (couponCode === "DISCOUNT10") {
       setIsCouponApplied(true);
     } else {
@@ -288,7 +340,9 @@ const deleteAllCartProducts = async (products) => {
         Giỏ hàng
       </h1>
       <div className="text-center text-lg my-3">
-        {data.length === 0 && !loading && <p className="bg-white py-5">No Data</p>}
+        {data.length === 0 && !loading && (
+          <p className="bg-white py-5">No Data</p>
+        )}
       </div>
 
       <div className="flex flex-col lg:flex-row gap-10 lg:justify-between p-4">
@@ -359,17 +413,67 @@ const deleteAllCartProducts = async (products) => {
             style={styles.input}
           />
 
+          {/* Shipping Method Selection */}
+          <div className=" py-2">
+            <label htmlFor="shippingMethod" style={{ fontWeight: "bold" }}>
+              Choose Shipping Method:
+            </label>
+            <select
+              id="shippingMethod"
+              value={selectedShippingMethod?._id || ""}
+              onChange={(e) => {
+                const selectedMethod = shippingMethods.find(
+                  (method) => method._id === e.target.value
+                );
+                setSelectedShippingMethod(selectedMethod || {}); // Set the entire method object or empty object
+              }}
+              style={{ width: "100%", margin: "10px 0", padding: "10px" }}
+            >
+              <option value="">Select a shipping method</option>
+              {shippingMethods.map((method) => (
+                <option key={method._id} value={method._id}>
+                  {method.name} - {displayINRCurrency(method.price)} (
+                  {method.minDeliveryDays} - {method.maxDeliveryDays} days)
+                </option>
+              ))}
+            </select>
+          </div>
           <h3 style={styles.sectionTitle}>Payment Method</h3>
           <div style={styles.paymentOption}>
             <input type="radio" id="payOS" name="paymentMethod" value="payOS" />
-            <label htmlFor="payOS" style={{ marginLeft: "7px",  fontSize: "18px" }}>
-
-               Payment by bank transfer (Scan VietQR code) via <b style={{ marginLeft: "5px", fontWeight: "bold", color: "purple", fontSize: "25px"}}>payOS</b>
+            <label
+              htmlFor="payOS"
+              style={{ marginLeft: "7px", fontSize: "18px" }}
+            >
+              Payment by bank transfer (Scan VietQR code) via{" "}
+              <b
+                style={{
+                  marginLeft: "5px",
+                  fontWeight: "bold",
+                  color: "purple",
+                  fontSize: "25px",
+                }}
+              >
+                payOS
+              </b>
             </label>
           </div>
 
-          <h3 style={{ marginTop: "10px",  fontSize: "15px" }}>
-          By proceeding with your purchase, you agree to <a style = {{color : "blue"}} href = "#">Terms </a> and <a  style = {{color : "blue"}}  href = "#">Conditions</a> and <a  style = {{color : "blue"}}  href="#">Privacy Policy</a> of us          </h3>
+          <h3 style={{ marginTop: "10px", fontSize: "15px" }}>
+            By proceeding with your purchase, you agree to{" "}
+            <a style={{ color: "blue" }} href="#">
+              Terms{" "}
+            </a>{" "}
+            and{" "}
+            <a style={{ color: "blue" }} href="#">
+              Conditions
+            </a>{" "}
+            and{" "}
+            <a style={{ color: "blue" }} href="#">
+              Privacy Policy
+            </a>{" "}
+            of us{" "}
+          </h3>
 
           <div style={styles.placeorder}>
             <a href="/payment" style={{ margin: "auto", marginLeft: "0px" }}>
@@ -426,6 +530,7 @@ const deleteAllCartProducts = async (products) => {
                       className="border border-blue-500 rounded px-2 py-1 flex-grow"
                     />
                     <button
+                      type="button" // Đảm bảo nút này không gửi form
                       onClick={handleCouponApply}
                       className="bg-blue-500 text-white px-4 py-1 rounded"
                     >
@@ -450,29 +555,31 @@ const deleteAllCartProducts = async (products) => {
               <div className="px-4 py-2">
                 <div className="flex justify-between items-center">
                   <p>Shipping</p>
-                  <p className="text-blue-600 font-medium">MIỄN PHÍ</p>
+                  <p className="text-blue-600 font-medium">
+                    {displayINRCurrency(selectedShippingMethod?.price || 0)}
+                  </p>
                 </div>
-                <p className="text-sm text-slate-400">Free shipping</p>
                 <p className="text-sm text-slate-400">Shipping to Việt Nam</p>
                 <p className="text-sm text-blue-600 cursor-pointer">
                   Change Address
                 </p>
-              </div>
-
-              {/* Shipping Option Section */}
-              <div className="px-4 py-2">
-                <div className="flex items-center gap-2">
-                  <input type="radio" checked readOnly />
-                  <p className="text-slate-600">Free shipping</p>
+                <div className="flex justify-between items-center">
+                  <p>Shipping Discount : </p>
+                  <p className="text-blue-600 font-medium">
+                    -{displayINRCurrency(shippingDiscount || 0)}
+                  </p>
                 </div>
-                <p className="ml-6 text-slate-400 text-sm">FREE</p>
               </div>
 
               {/* Total Section */}
               <div className="flex items-center justify-between px-4 py-2 font-medium text-slate-600">
                 <p>TOTAL</p>
                 {displayINRCurrency(
-                  isCouponApplied ? totalPrice * 0.9 : totalPrice
+                  isCouponApplied
+                    ? totalPrice * 0.9
+                    : totalPrice +
+                        (selectedShippingMethod?.price || 0) -
+                        shippingDiscount
                 )}
               </div>
 

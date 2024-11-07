@@ -25,6 +25,9 @@ const orderSchema = mongoose.Schema({
     },
     totalPrice: { type: Number, required: true },
     status: { type: String, default: 'pending' },
+    order_status: {type: String, default: 'pending'},
+    shippingMethod: { type: String, ref: 'shipping', required: true }
+
 },{
     timestamps : true
 })

@@ -1,5 +1,4 @@
-
-const backendDomin = "https://swp-final-backend.onrender.com";
+const backendDomin = "https://swp-final-backend.onrender.com"
 
 const SummaryApi = {
     signUP : {
@@ -126,6 +125,22 @@ const SummaryApi = {
     deleteShippingMethod: {
         url : `${backendDomin}/api/delete-shipping-method`,
         method : 'post'
+    },
+    updateOrderStatus: {
+        url : `${backendDomin}/api/update-order-status`,
+        method : 'post'
+    },
+    updateStockQuantity: {
+        url : `${backendDomin}/api/update-stock-quantity`,
+        method : 'post'
+    },
+    deleteProduct: {
+        url : `${backendDomin}/api/delete-product`,
+        method: 'post'
+    },
+    revenueSummary: {
+        url : `${backendDomin}/api/revenue-summary`,
+        method : 'get'
     }
 }
 
