@@ -29,6 +29,12 @@ const allOrders =  require('../controller/order/allOrders')
 const userOrders =  require('../controller/order/userOrders')
 const editProfileController = require('../controller/user/editProfile')
 const changePasswordController = require('../controller/user/changePasswordController')
+const orderDetail = require('../controller/order/orderDetail')
+const addShippingMethod = require('../controller/shipping/addShippingMethod');
+const allShippingMethods = require('../controller/shipping/allShippingMethods');
+const updateShippingMethod = require('../controller/shipping/updateShippingMethod');
+const deleteShippingMethod = require('../controller/shipping/deleteShippingMethod');
+
 
 router.post("/signup",userSignUpController)
 router.post("/signin",userSignInController)
@@ -70,6 +76,18 @@ router.post("/create-payment-link", authToken, payment);
 router.post("/edit-profile", editProfileController)
 router.post("/change-password", changePasswordController)
 
+router.get("/order-detail/:orderId", authToken, orderDetail);
 
+router.get("/all-shipping-method", authToken, allShippingMethods);
+// Route to get all shipping methods
+
+// Route to add a new shipping method
+router.post('/add-shipping-method', authToken, addShippingMethod);
+
+// Route to update an existing shipping method
+router.post("/update-shipping-method", authToken, updateShippingMethod);
+
+// Route to delete a shipping method
+router.post("/delete-shipping-method/:id", authToken, deleteShippingMethod);
 
 module.exports = router

@@ -1,6 +1,5 @@
-import EditProfile from "../components/EditProfile"
 
-const backendDomin = "http://localhost:8080"
+const backendDomin = "https://swp-final-backend.onrender.com";
 
 const SummaryApi = {
     signUP : {
@@ -108,6 +107,26 @@ const SummaryApi = {
         url : `${backendDomin}/api/user-order`,
         method : 'get'
     },
+    orderDetail: {
+        url : `${backendDomin}/api/order-detail`,  // Add this line for order details
+        method: 'get'
+    },
+    allShippingMethods: {
+        url : `${backendDomin}/api/all-shipping-method`,
+        method : 'get'
+    },
+    addShippingMethod: {
+        url : `${backendDomin}/api/add-shipping-method`,
+        method : 'post'
+    },
+    updateShippingMethod: {
+        url : `${backendDomin}/api/update-shipping-method`,
+        method : 'post'
+    },
+    deleteShippingMethod: {
+        url : `${backendDomin}/api/delete-shipping-method`,
+        method : 'post'
+    }
 }
 
 
