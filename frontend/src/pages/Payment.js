@@ -1,6 +1,6 @@
 import React, { useContext, useEffect, useState } from "react";
-import { toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css'; // Import CSS cho Toastify
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css"; // Import CSS cho Toastify
 import SummaryApi from "../common";
 import Context from "../context";
 import displayINRCurrency from "../helpers/displayCurrency";
@@ -203,7 +203,13 @@ const Payment = () => {
         (isCouponApplied ? totalPrice * 0.9 : totalPrice) +
         selectedShippingMethod.price -
         shippingDiscount,
-      shippingMethod: selectedShippingMethod, // Add selected shipping method here
+      shippingMethod: {
+        name: selectedShippingMethod.name,
+        price: selectedShippingMethod.price,
+        estimatedDelivery: selectedShippingMethod.estimatedDelivery,
+        minDeliveryDays: selectedShippingMethod.minDeliveryDays,
+        maxDeliveryDays: selectedShippingMethod.maxDeliveryDays,
+      }, // Add selected shipping method here
     };
 
     try {
@@ -224,7 +230,9 @@ const Payment = () => {
       if (responseData.success) {
         payment(
           responseData.order._id,
-          (isCouponApplied ? totalPrice * 0.9 : totalPrice) + selectedShippingMethod.price -shippingDiscount,
+          (isCouponApplied ? totalPrice * 0.9 : totalPrice) +
+            selectedShippingMethod.price -
+            shippingDiscount,
           orderData.products,
           orderCode
         );

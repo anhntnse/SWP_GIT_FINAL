@@ -97,7 +97,7 @@ const OrderDetail = ({ orderId, onBack }) => {
 
       <div className="border-t pt-6">
         <h3 className="text-2xl font-semibold text-gray-700 mb-4">Shipping Method</h3>
-        <p className="text-lg text-gray-800 mb-4">{orderDetail.shippingMethod}</p>
+        <p className="text-lg text-gray-800 mb-4">{orderDetail.shippingMethod.name}</p>
         <p className="text-lg text-gray-800">
           <strong>Order Status:</strong> {orderDetail.order_status}
         </p>
