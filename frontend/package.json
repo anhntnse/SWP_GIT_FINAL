@@ -24,9 +24,8 @@
     "react-toastify": "^10.0.4",
     "recharts": "^2.13.3",
     "sweetalert2": "^11.14.4",
-    "web-vitals": "^2.1.4",
-    "tailwindcss": "^3.4.14"
-
+    "tailwindcss": "^3.4.14",
+    "web-vitals": "^2.1.4"
   },
   "scripts": {
     "start": "react-scripts start",
@@ -51,5 +50,8 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "devDependencies": {
+    "@babel/plugin-proposal-private-property-in-object": "^7.21.11"
   }
 }

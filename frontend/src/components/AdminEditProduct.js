@@ -67,7 +67,6 @@ const AdminEditProduct = ({
   }
 
 
-  {/**upload product */}
   const handleSubmit = async(e) =>{
     e.preventDefault()
     
