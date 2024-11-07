@@ -3,7 +3,7 @@ const orderModel = require('../../models/orderModel'); // Đảm bảo đường
 
 // Controller để tạo đơn hàng mới
 const createOrder = async (req, res) => {
-    const { userId, products,  totalPrice, shipping_address, orderCode, status } = req.body;
+    const { userId, products,  totalPrice, shipping_address, orderCode, status, shippingMethod } = req.body;
 
   try {
     // Tạo một đơn hàng mới từ dữ liệu được gửi lên
@@ -13,6 +13,7 @@ const createOrder = async (req, res) => {
       totalPrice: totalPrice,
       shipping_address:  shipping_address,
       orderCode: orderCode,
+      shippingMethod: shippingMethod,
       status: status || 'pending', // Mặc định là 'pending' nếu không truyền vào
       order_status: 'pending' // Mặc định là 'pending' nếu không truyền vào
 
