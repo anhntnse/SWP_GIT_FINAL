@@ -19,12 +19,12 @@ app.use(express.urlencoded({ extended: false }));
 
 app.use("/api",router)
 
-const PORT = 8080 || process.env.PORT
+const PORT = process.env.PORT || 8080
 
 
 connectDB().then(()=>{
     app.listen(PORT,()=>{
         console.log("connnect to DB")
-        console.log("Server is running "+PORT)
+        console.log("Server is running "+ {PORT})
     })
 })
