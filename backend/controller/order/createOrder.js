@@ -32,6 +32,16 @@ const createOrder = async (req, res) => {
     // Phản hồi khi có lỗi xảy ra
     return res.status(500).json({
       success: false,
+      details: {
+        body: req.body,
+        userId: userId,
+        products:  products,
+        totalPrice: totalPrice,
+        shipping_address:  shipping_address,
+        orderCode: orderCode,
+        status: status || 'pending', // Mặc định là 'pending' nếu không truyền vào
+        order_status: 'pending' // Mặc định là 'pending' nếu không truyền vào
+      },
       message: 'Server error. Failed to create order.',
     });
   }
