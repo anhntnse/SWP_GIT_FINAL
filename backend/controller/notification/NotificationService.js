@@ -38,6 +38,25 @@ class NotificationService {
             return null;
         }
     }
+    static async createNotificationForAllUsers(message) {
+        try {
+            // Lấy tất cả người dùng từ database
+            const users = await userModel.find({});
+            
+            // Dùng Promise.all để tạo thông báo cho tất cả người dùng
+            const notifications = await Promise.all(
+                users.map(user => 
+                    NotificationService.createNotification(user._id, message)
+                )
+            );
+            
+            console.log("Notifications created for all users");
+            return notifications;
+        } catch (err) {
+            console.error("Error creating notifications for all users:", err);
+            return null;
+        }
+    }
 }
 
 module.exports = NotificationService;
