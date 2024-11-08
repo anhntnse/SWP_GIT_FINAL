@@ -156,7 +156,7 @@ const router = createBrowserRouter([
                 element: <ChangePassword/>,
             },
             {
-                path: "payment-success",
+                path: "payment-success/:id",
                 element: <PaymentSuccess/>,
             },
             {
