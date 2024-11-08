@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { FaHeadset, FaTimes } from 'react-icons/fa'; // Import Font Awesome icons
+import './support.css'
 
 function SupportCustomer() {
     const [isOpen, setIsOpen] = useState(false);
