@@ -117,7 +117,9 @@ const Cart = () => {
 
     // If not selected yet, check stock before selecting
     if (!isSelected && product.quantity > product.productId.stock_quantity) {
-      setOutOfStock(`The product "${product.productId.productName}" is out of stock and cannot be selected.`);
+      setOutOfStock(
+        `The product "${product.productId.productName}" is out of stock and cannot be selected.`
+      );
       return;
     }
 
@@ -145,7 +147,7 @@ const Cart = () => {
   return (
     <div className="container-fluid mx-auto">
       <h1 style={styles.pagetitle} title="Giỏ hàng" itemProp="headline">
-        Cart
+        Giỏ hàng
       </h1>
       <div className="text-center text-lg my-3">
         {data.length === 0 && !loading && (
@@ -154,7 +156,9 @@ const Cart = () => {
       </div>
 
       {/* Display out-of-stock message */}
-      {outOfStock && <div className="text-red-500 text-center">{outOfStock}</div>}
+      {outOfStock && (
+        <div className="text-red-500 text-center">{outOfStock}</div>
+      )}
 
       <div className="flex flex-col lg:flex-row gap-10 lg:justify-between p-4">
         {/* View products */}
@@ -166,76 +170,78 @@ const Cart = () => {
                   className="w-full bg-slate-200 h-32 my-2 border border-slate-300 animate-pulse rounded"
                 ></div>
               ))
-            : data.map((product) => (
-                <div
-                  key={product._id}
-                  className="w-full bg-white h-32 my-2 border border-slate-300 rounded grid grid-cols-[32px,128px,1fr]"
-                >
-                  {/* Checkbox for selecting products */}
-                  <div className="flex items-center justify-center">
-                    <input
-                      type="checkbox"
-                      checked={selectedProducts.includes(product._id)}
-                      onChange={() => toggleProductSelection(product)}
-                    />
-                  </div>
-                  <div className="w-32 h-32 bg-slate-200">
-                    <img
-                      src={product.productId?.productImage[0]}
-                      className="w-full h-full object-scale-down mix-blend-multiply"
-                      alt={product.productId.productName}
-                    />
-                  </div>
-                  <div className="px-4 py-2 relative">
-                    {/* Delete product */}
-                    <div
-                      className="absolute right-0 text-red-600 rounded-full p-2 hover:bg-gray-600 hover:text-white cursor-pointer"
-                      onClick={() => deleteCartProduct(product._id)}
-                    >
-                      <MdDelete />
+            : data
+                .filter((product) => product !== null) // Filter out null products
+                .map((product) => (
+                  <div
+                    key={product._id}
+                    className="w-full bg-white h-32 my-2 border border-slate-300 rounded grid grid-cols-[32px,128px,1fr]"
+                  >
+                    {/* Checkbox for selecting products */}
+                    <div className="flex items-center justify-center">
+                      <input
+                        type="checkbox"
+                        checked={selectedProducts.includes(product._id)}
+                        onChange={() => toggleProductSelection(product)}
+                      />
                     </div>
-                    <h2 className="text-lg lg:text-xl text-ellipsis line-clamp-1">
-                      {product.productId.productName}
-                    </h2>
-                    <p className="capitalize text-slate-500">
-                      {product.productId.category}
-                    </p>
-                    <div className="flex items-center justify-between">
-                      <p className="text-red-600 font-medium text-lg">
-                        {displayINRCurrency(product.productId.sellingPrice)}
-                      </p>
-                      <p className="text-slate-600 font-semibold text-lg">
-                        {displayINRCurrency(
-                          product.productId.sellingPrice * product.quantity
-                        )}
-                      </p>
+                    <div className="w-32 h-32 bg-slate-200">
+                      <img
+                        src={product.productId?.productImage[0]}
+                        className="w-full h-full object-scale-down mix-blend-multiply"
+                        alt={product.productId.productName}
+                      />
                     </div>
-                    <div className="flex items-center gap-3 mt-1">
-                      <button
-                        className="border border-red-600 text-red-600 hover:bg-gray-600 hover:text-white w-6 h-6 flex justify-center items-center rounded"
-                        onClick={() =>
-                          decraseQty(product._id, product.quantity)
-                        }
+                    <div className="px-4 py-2 relative">
+                      {/* Delete product */}
+                      <div
+                        className="absolute right-0 text-red-600 rounded-full p-2 hover:bg-gray-600 hover:text-white cursor-pointer"
+                        onClick={() => deleteCartProduct(product._id)}
                       >
-                        -
-                      </button>
-                      <span>{product.quantity}</span>
-                      <button
-                        className="border border-red-600 text-red-600 hover:bg-gray-600 hover:text-white w-6 h-6 flex justify-center items-center rounded"
-                        onClick={() =>
-                          increaseQty(
-                            product._id,
-                            product.quantity,
-                            product.productId.stock_quantity
-                          )
-                        }
-                      >
-                        +
-                      </button>
+                        <MdDelete />
+                      </div>
+                      <h2 className="text-lg lg:text-xl text-ellipsis line-clamp-1">
+                        {product.productId.productName}
+                      </h2>
+                      <p className="capitalize text-slate-500">
+                        {product.productId.category}
+                      </p>
+                      <div className="flex items-center justify-between">
+                        <p className="text-red-600 font-medium text-lg">
+                          {displayINRCurrency(product.productId.sellingPrice)}
+                        </p>
+                        <p className="text-slate-600 font-semibold text-lg">
+                          {displayINRCurrency(
+                            product.productId.sellingPrice * product.quantity
+                          )}
+                        </p>
+                      </div>
+                      <div className="flex items-center gap-3 mt-1">
+                        <button
+                          className="border border-red-600 text-red-600 hover:bg-gray-600 hover:text-white w-6 h-6 flex justify-center items-center rounded"
+                          onClick={() =>
+                            decraseQty(product._id, product.quantity)
+                          }
+                        >
+                          -
+                        </button>
+                        <span>{product.quantity}</span>
+                        <button
+                          className="border border-red-600 text-red-600 hover:bg-gray-600 hover:text-white w-6 h-6 flex justify-center items-center rounded"
+                          onClick={() =>
+                            increaseQty(
+                              product._id,
+                              product.quantity,
+                              product.productId.stock_quantity
+                            )
+                          }
+                        >
+                          +
+                        </button>
+                      </div>
                     </div>
                   </div>
-                </div>
-              ))}
+                ))}
         </div>
 
         {/* Cart Summary */}
