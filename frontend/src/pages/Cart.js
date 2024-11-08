@@ -171,7 +171,7 @@ const Cart = () => {
                 ></div>
               ))
             : data
-                .filter((product) => product !== null) // Filter out null products
+                .filter((product) => product && product.productId) // Check for non-null product and productId
                 .map((product) => (
                   <div
                     key={product._id}
@@ -187,9 +187,9 @@ const Cart = () => {
                     </div>
                     <div className="w-32 h-32 bg-slate-200">
                       <img
-                        src={product.productId?.productImage[0]}
+                        src={product.productId.productImage?.[0] || ""}
                         className="w-full h-full object-scale-down mix-blend-multiply"
-                        alt={product.productId.productName}
+                        alt={product.productId.productName || "Product Image"}
                       />
                     </div>
                     <div className="px-4 py-2 relative">
@@ -204,15 +204,18 @@ const Cart = () => {
                         {product.productId.productName}
                       </h2>
                       <p className="capitalize text-slate-500">
-                        {product.productId.category}
+                        {product.productId.category || "Unknown Category"}
                       </p>
                       <div className="flex items-center justify-between">
                         <p className="text-red-600 font-medium text-lg">
-                          {displayINRCurrency(product.productId.sellingPrice)}
+                          {displayINRCurrency(
+                            product.productId.sellingPrice || 0
+                          )}
                         </p>
                         <p className="text-slate-600 font-semibold text-lg">
                           {displayINRCurrency(
-                            product.productId.sellingPrice * product.quantity
+                            (product.productId.sellingPrice || 0) *
+                              product.quantity
                           )}
                         </p>
                       </div>
@@ -232,7 +235,7 @@ const Cart = () => {
                             increaseQty(
                               product._id,
                               product.quantity,
-                              product.productId.stock_quantity
+                              product.productId.stock_quantity || 0
                             )
                           }
                         >

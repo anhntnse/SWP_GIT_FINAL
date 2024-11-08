@@ -40,16 +40,16 @@ const AdminPanel = () => {
               All Users
             </Link>
             <Link to={"all-products"} className="px-2 py-1 hover:bg-slate-100">
-              All Product
+              All Products
             </Link>
             <Link to={"all-orders"} className="px-2 py-1 hover:bg-slate-100">
-              All Order
+              All Orders
             </Link>
             <Link
               to={"all-shipping-methods"}
               className="px-2 py-1 hover:bg-slate-100"
             >
-              All Shipping Method
+              All Shipping Methods
             </Link>
             <Link
               to={"inventory-management"}
@@ -64,13 +64,13 @@ const AdminPanel = () => {
               Revenue Summary
             </Link>
             <Link to={"AllNews"} className="px-2 py-1 hover:bg-slate-100">
-              All New
+              All News
             </Link>
             <Link to={"discount"} className="px-2 py-1 hover:bg-slate-100">
-              All Discount
+              All Discounts
             </Link>
             <Link to={"all-review"} className="px-2 py-1 hover:bg-slate-100">
-              All Review
+              All Reviews
             </Link>
             <Link to={"all-onSale"} className="px-2 py-1 hover:bg-slate-100">
               All On Sale
@@ -79,7 +79,7 @@ const AdminPanel = () => {
               Post User
             </Link>
             <Link to={"all-pre-order"} className="px-2 py-1 hover:bg-slate-100">
-              All Pre-order
+              All Pre-orders
             </Link>
           </nav>
         </div>
