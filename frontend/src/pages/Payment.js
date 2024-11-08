@@ -275,7 +275,7 @@ const Payment = () => {
       amount: Math.ceil(totalPrice), // Total price calculated in createOrder
       description: "Thanh toan don hang", // Payment description
       items: items,
-      returnUrl: `https://swp-git-final.onrender.com/payment-success?_id=${_id}`,  // Correct syntax with backticks
+      returnUrl: `https://swp-git-final.onrender.com/payment-success?_id=${_id}`, // Redirect URL after successful payment
       cancelUrl: "https://swp-git-final.onrender.com", // Redirect URL after canceled payment
     };
 
