@@ -7,7 +7,7 @@ const User = require('../models/userModel');
 passport.use(new GoogleStrategy({
     clientID: process.env.GOOGLE_CLIENT_ID,
     clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-    callbackURL: "/api/auth/google/callback",
+    callbackURL: "https://swp-git-final.onrender.com/api/auth/google/callback",
 },
     async function (accessToken, refreshToken, profile, cb) {
 
@@ -46,7 +46,7 @@ passport.use(new GoogleStrategy({
 passport.use(new FacebookStrategy({
     clientID: process.env.FACEBOOK_APP_ID,
     clientSecret: process.env.FACEBOOK_APP_SECRET,
-    callbackURL: "/api/auth/facebook/callback",
+    callbackURL: "https://swp-git-final.onrender.com/api/auth/facebook/callback",
     profileFields: ['displayName', 'email', 'photos', 'id']
 },
     async function (accessToken, refreshToken, profile, cb) {
