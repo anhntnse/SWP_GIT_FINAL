@@ -1,8 +1,8 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useState, useEffect } from "react";
 import Logo from "./Logo";
 import { GrSearch } from "react-icons/gr";
 import { FaRegCircleUser } from "react-icons/fa6";
-import { FaRegHeart, FaShoppingCart } from "react-icons/fa";
+import { FaShoppingCart, FaBell  } from "react-icons/fa";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import SummaryApi from "../common";
@@ -21,6 +21,7 @@ const Header = () => {
   const URLSearch = new URLSearchParams(searchInput?.search);
   const searchQuery = URLSearch.getAll("q");
   const [search, setSearch] = useState(searchQuery);
+  const [unreadNotifications, setUnreadNotifications] = useState(0);
 
   const handleLogout = async () => {
     const fetchData = await fetch(SummaryApi.logout_user.url, {
@@ -51,6 +52,29 @@ const Header = () => {
       navigate("/search");
     }
   };
+
+  // Fetch the unread notifications count
+  const fetchUnreadNotificationsCount = async () => {
+    try {
+      const response = await fetch(
+        SummaryApi.getNotifications.url(user?._id) + "?readStatus=false"
+      );
+      if (!response.ok) {
+        throw new Error("Failed to fetch notifications count");
+      }
+      const data = await response.json();
+      setUnreadNotifications(data.total); // Assuming `total` contains the count of unread notifications
+    } catch (err) {
+      console.error("Error fetching unread notifications count:", err);
+    }
+  };
+
+  useEffect(() => {
+    if (user?._id) {
+      fetchUnreadNotificationsCount();
+    }
+  }, [user]); // Fetch count when user logs in
+
   return (
     <header className="h-16 shadow-md bg-white fixed w-full z-40">
       <div className=" h-full container mx-auto flex items-center px-4 justify-between">
@@ -142,6 +166,19 @@ const Header = () => {
               <div className="bg-gray-600 text-white w-5 h-5 rounded-full p-1 flex items-center justify-center absolute -top-2 -right-3">
                 <p className="text-sm">{context?.cartProductCount}</p>
               </div>
+            </Link>
+          )}
+
+          {user?._id && (
+            <Link to={"/notifications"} className="text-2xl relative">
+              <span>
+                <FaBell />
+              </span>
+              {unreadNotifications > 0 && (
+                <div className="bg-red-600 text-white w-5 h-5 rounded-full p-1 flex items-center justify-center absolute -top-2 -right-3">
+                  <p className="text-sm">{unreadNotifications}</p>
+                </div>
+              )}
             </Link>
           )}
 

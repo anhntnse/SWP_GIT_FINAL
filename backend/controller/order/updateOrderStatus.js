@@ -39,6 +39,11 @@ const updateOrderStatus = async (req, res) => {
                 );
             }
         }
+        // Send notification to the user about the status update
+        const userId = updatedOrder.userId; 
+        const orderCode = updatedOrder.orderCode;
+        const message = `Your order  ${orderCode} status has been updated to ${status}`;
+        await NotificationService.addNotificationToUser(userId, message);
 
         return res.status(200).json({
             success: true,

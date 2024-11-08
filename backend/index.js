@@ -5,6 +5,7 @@ require('dotenv').config()
 const connectDB = require('./config/db')
 const router = require('./routes')
 const PayOS = require("@payos/node");
+require('./helpers/passport');
 
 
 const app = express()
@@ -19,12 +20,12 @@ app.use(express.urlencoded({ extended: false }));
 
 app.use("/api",router)
 
-const PORT = process.env.PORT || 8080
+const PORT = 8080 || process.env.PORT
 
 
 connectDB().then(()=>{
     app.listen(PORT,()=>{
         console.log("connnect to DB")
-        console.log("Server is running "+ {PORT})
+        console.log("Server is running "+PORT)
     })
 })

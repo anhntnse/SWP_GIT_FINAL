@@ -4,19 +4,23 @@ import "react-toastify/dist/ReactToastify.css"; // Import CSS cho Toastify
 import SummaryApi from "../common";
 import Context from "../context";
 import displayINRCurrency from "../helpers/displayCurrency";
-import { useNavigate } from "react-router-dom";
-import { useLocation } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 
 const Payment = () => {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(false);
   const context = useContext(Context);
+  const [discount, setDiscount] = useState(null);
   const [showCoupon, setShowCoupon] = useState(false);
   const [couponCode, setCouponCode] = useState("");
   const [isCouponApplied, setIsCouponApplied] = useState(false);
   const [shippingMethods, setShippingMethods] = useState([]); // New state for shipping methods
   const [selectedShippingMethod, setSelectedShippingMethod] = useState(""); // State for selected method
   const [shippingDiscount, setShippingDiscount] = useState(0);
+  const [couponNotification, setCouponNotification] = useState({
+    success: false,
+    message: "",
+  });
 
   const navigate = useNavigate();
 
@@ -167,14 +171,30 @@ const Payment = () => {
   useEffect(() => {
     setLoading(true);
     setShippingDiscount(calculateShippingDiscount());
+    console.log("Called call " + shippingDiscount);
+
     handleLoading();
     setLoading(false);
   }, [selectedShippingMethod]);
 
-  const totalPrice = data.reduce(
-    (preve, curr) => preve + curr.quantity * curr?.productId?.sellingPrice,
-    0
-  );
+  const computeTotalPrice = () => {
+    let totalPrice = data.reduce(
+      (preve, curr) => preve + curr.quantity * curr?.productId?.sellingPrice,
+      0
+    );
+    if (discount) {
+      totalPrice = totalPrice - (discount.value * totalPrice) / 100;
+    }
+
+    return totalPrice;
+  };
+
+  const totalPrice = discount
+    ? computeTotalPrice()
+    : data.reduce(
+        (preve, curr) => preve + curr.quantity * curr?.productId?.sellingPrice,
+        0
+      );
 
   const createOrder = async () => {
     const userDetails = await context.fetchUserDetails();
@@ -199,10 +219,7 @@ const Payment = () => {
         phone: formData.phone,
       },
       status: "pending",
-      totalPrice:
-        (isCouponApplied ? totalPrice * 0.9 : totalPrice) +
-        selectedShippingMethod.price -
-        shippingDiscount,
+      totalPrice: totalPrice + selectedShippingMethod.price - shippingDiscount,
       shippingMethod: {
         name: selectedShippingMethod.name,
         price: selectedShippingMethod.price,
@@ -230,9 +247,7 @@ const Payment = () => {
       if (responseData.success) {
         payment(
           responseData.order._id,
-          (isCouponApplied ? totalPrice * 0.9 : totalPrice) +
-            selectedShippingMethod.price -
-            shippingDiscount,
+          totalPrice + selectedShippingMethod.price - shippingDiscount,
           orderData.products,
           orderCode
         );
@@ -257,11 +272,11 @@ const Payment = () => {
 
     const body = {
       orderCode: orderCode,
-      amount: totalPrice, // Total price calculated in createOrder
+      amount: Math.ceil(totalPrice), // Total price calculated in createOrder
       description: "Thanh toan don hang", // Payment description
       items: items,
-      returnUrl: `http://localhost:3000/payment-success?_id=${_id}`, // Redirect URL after successful payment
-      cancelUrl: `http://localhost:3000/cancel.html`, // Redirect URL after canceled payment
+      returnUrl: 'https://swp-git-final.onrender.com/payment-success?_id=${_id}', // Redirect URL after successful payment
+      cancelUrl: "https://swp-git-final.onrender.com", // Redirect URL after canceled payment
     };
 
     try {
@@ -335,15 +350,61 @@ const Payment = () => {
     createOrder(); // Call createOrder function
   };
 
-  const handleCouponApply = async (e) => {
-    e.preventDefault();
-    if (couponCode === "DISCOUNT10") {
-      setIsCouponApplied(true);
+  const handleCouponApply = async () => {
+    // if (couponCode === "DISCOUNT10") {
+    //   setIsCouponApplied(true);
+    // } else {
+    //   alert("Invalid coupon code");
+    // }
+    console.log("Apply coupon function called");
+
+    const response = await fetch(SummaryApi.applyDiscount.url, {
+      method: SummaryApi.applyDiscount.method,
+      credentials: "include",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ couponCode }),
+    });
+
+    const resData = await response.json();
+
+    if (resData.data) {
+      if (new Date(resData.data.expirationDate).getTime() >= Date.now()) {
+        const discount = resData.data;
+        console.log("discount ", discount);
+        setDiscount(discount);
+        setCouponNotification({
+          success: true,
+          message: "Coupon applied successfully!",
+        });
+      } else {
+        setCouponNotification({
+          success: false,
+          message:
+            "Coupon code has expired. Please select another coupon code !",
+        });
+      }
     } else {
-      alert("Invalid coupon code");
+      setCouponNotification({
+        success: true,
+        message: "Not Found Coupon!",
+      });
     }
   };
+  const computeDiscountPrice = () => {
+    let totalPrice = data.reduce(
+      (preve, curr) => preve + curr.quantity * curr?.productId?.sellingPrice,
+      0
+    );
 
+    return (totalPrice * discount?.value) / 100;
+  };
+
+  const firstTotalPrice = data.reduce(
+    (preve, curr) => preve + curr.quantity * curr?.productId?.sellingPrice,
+    0
+  );
   return (
     <form className="container-fluid mx-auto" onSubmit={handleSubmit}>
       <h1 style={styles.pagetitle} title="Giỏ hàng" itemprop="headline">
@@ -548,6 +609,19 @@ const Payment = () => {
                     </button>
                   </div>
                 )}
+
+                {couponNotification.success ? (
+                  <p
+                    className="text-green-600 mt-2"
+                    style={{ fontSize: "13px" }}
+                  >
+                    {couponNotification.message}
+                  </p>
+                ) : (
+                  <p className="text-red-600 mt-2" style={{ fontSize: "13px" }}>
+                    {couponNotification.message}
+                  </p>
+                )}
                 {isCouponApplied && (
                   <p className="text-green-600 mt-2">
                     Coupon applied successfully!
@@ -558,7 +632,9 @@ const Payment = () => {
               {/* Subtotal Section */}
               <div className="flex items-center justify-between px-4 py-2 text-slate-600">
                 <p>Subtotal</p>
-                <p className="font-medium">{displayINRCurrency(totalPrice)}</p>
+                <p className="font-medium">
+                  {displayINRCurrency(firstTotalPrice)}
+                </p>
               </div>
 
               {/* Shipping Section */}
@@ -581,6 +657,15 @@ const Payment = () => {
                 </div>
               </div>
 
+              {/* Price Section */}
+              {discount && (
+                <div className="flex justify-between items-center px-4 py-1 text-slate-600 gap-2">
+                  <p className="text-sm text-slate-500">Discounts price:</p>
+                  <p className="text-sm text-slate-500">
+                    - {displayINRCurrency(computeDiscountPrice())}
+                  </p>
+                </div>
+              )}
               {/* Total Section */}
               <div className="flex items-center justify-between px-4 py-2 font-medium text-slate-600">
                 <p>TOTAL</p>

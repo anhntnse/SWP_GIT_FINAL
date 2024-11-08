@@ -106,6 +106,26 @@ const AllOrders = () => {
   useEffect(() => {
     fetchAllOrders();
   }, []);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [ordersPerPage] = useState(30);
+
+  // Calculate pagination
+  const indexOfLastOrder = currentPage * ordersPerPage;
+  const indexOfFirstOrder = indexOfLastOrder - ordersPerPage;
+  const currentOrders = allOrder.slice(indexOfFirstOrder, indexOfLastOrder);
+  const totalPages = Math.ceil(allOrder.length / ordersPerPage);
+
+  const handleNextPage = () => {
+    if (currentPage < totalPages) {
+      setCurrentPage((prevPage) => prevPage + 1);
+    }
+  };
+
+  const handlePrevPage = () => {
+    if (currentPage > 1) {
+      setCurrentPage((prevPage) => prevPage - 1);
+    }
+  };
 
   return (
     <div className="bg-white pb-4">
@@ -217,6 +237,31 @@ const AllOrders = () => {
           ))}
         </tbody>
       </table>
+
+      {/* Pagination controls */}
+      <div className="flex items-center justify-center mt-4 space-x-2">
+        <button
+          onClick={handlePrevPage}
+          disabled={currentPage === 1}
+          className={`${currentPage === 1 ? "bg-gray-300 cursor-not-allowed" : "bg-yellow-500 hover:bg-yellow-600"
+            } text-white font-semibold py-2 px-4 rounded-l-md transition duration-200 ease-in-out`}
+        >
+          Previous
+        </button>
+
+        <span className="text-lg font-medium">
+          Page {currentPage} of {totalPages}
+        </span>
+
+        <button
+          onClick={handleNextPage}
+          disabled={currentPage === totalPages}
+          className={`${currentPage === totalPages ? "bg-gray-300 cursor-not-allowed" : "bg-yellow-500 hover:bg-yellow-600"
+            } text-white font-semibold py-2 px-4 rounded-r-md transition duration-200 ease-in-out`}
+        >
+          Next
+        </button>
+      </div>
     </div>
   );
 };

@@ -10,6 +10,7 @@ const Cart = () => {
   const [loading, setLoading] = useState(false);
   const context = useContext(Context);
   const [selectedProducts, setSelectedProducts] = useState([]);
+  const [outOfStock, setOutOfStock] = useState(""); // State for out-of-stock warning
   const loadingCart = new Array(4).fill(null);
   const styles = {
     pagetitle: {
@@ -49,7 +50,12 @@ const Cart = () => {
     setLoading(false);
   }, []);
 
-  const increaseQty = async (id, qty) => {
+  const increaseQty = async (id, qty, stockQty) => {
+    if (qty + 1 > stockQty) {
+      setOutOfStock("This product is out of stock!");
+      return;
+    }
+    setOutOfStock("");
     const response = await fetch(SummaryApi.updateCartProduct.url, {
       method: SummaryApi.updateCartProduct.method,
       credentials: "include",
@@ -105,11 +111,22 @@ const Cart = () => {
     }
   };
 
-  const toggleProductSelection = (id) => {
+  // Toggle product selection with stock check
+  const toggleProductSelection = (product) => {
+    const isSelected = selectedProducts.includes(product._id);
+
+    // If not selected yet, check stock before selecting
+    if (!isSelected && product.quantity > product.productId.stock_quantity) {
+      setOutOfStock(`The product "${product.productId.productName}" is out of stock and cannot be selected.`);
+      return;
+    }
+
+    // Clear out-of-stock message if selection is valid
+    setOutOfStock("");
     setSelectedProducts((prevSelected) =>
-      prevSelected.includes(id)
-        ? prevSelected.filter((productId) => productId !== id)
-        : [...prevSelected, id]
+      isSelected
+        ? prevSelected.filter((productId) => productId !== product._id)
+        : [...prevSelected, product._id]
     );
   };
 
@@ -136,6 +153,9 @@ const Cart = () => {
         )}
       </div>
 
+      {/* Display out-of-stock message */}
+      {outOfStock && <div className="text-red-500 text-center">{outOfStock}</div>}
+
       <div className="flex flex-col lg:flex-row gap-10 lg:justify-between p-4">
         {/* View products */}
         <div className="w-full max-w-3xl">
@@ -156,13 +176,14 @@ const Cart = () => {
                     <input
                       type="checkbox"
                       checked={selectedProducts.includes(product._id)}
-                      onChange={() => toggleProductSelection(product._id)}
+                      onChange={() => toggleProductSelection(product)}
                     />
                   </div>
                   <div className="w-32 h-32 bg-slate-200">
                     <img
                       src={product.productId.productImage[0]}
                       className="w-full h-full object-scale-down mix-blend-multiply"
+                      alt={product.productId.productName}
                     />
                   </div>
                   <div className="px-4 py-2 relative">
@@ -202,7 +223,11 @@ const Cart = () => {
                       <button
                         className="border border-red-600 text-red-600 hover:bg-gray-600 hover:text-white w-6 h-6 flex justify-center items-center rounded"
                         onClick={() =>
-                          increaseQty(product._id, product.quantity)
+                          increaseQty(
+                            product._id,
+                            product.quantity,
+                            product.productId.stock_quantity
+                          )
                         }
                       >
                         +
@@ -250,7 +275,6 @@ const Cart = () => {
                 </p>
               </div>
 
-                
               <Link to="/payment" state={{ selectedProducts }}>
                 <button
                   className="bg-blue-600 p-2 text-white w-full rounded-b-lg"

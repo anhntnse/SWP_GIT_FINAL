@@ -16,9 +16,26 @@ const productSchema = mongoose.Schema({
     description : String,
     price : Number,
     sellingPrice : Number,
+    salePrice: {
+        type: Number,
+    },
     onSale: {
         type: Boolean,
         default: false // Default to false, meaning not on sale
+    },
+    expDate: {
+        type: Date,
+    },
+    preOrderAvailable: {
+        type: Boolean,
+        default: false,
+    },
+    releaseDate: {
+        type: Date
+    },
+    stockForPreOrder: {
+        type: Number,
+        default: 0,
     }
 },{
     timestamps : true

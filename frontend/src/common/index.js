@@ -33,6 +33,18 @@ const SummaryApi = {
         url : `${backendDomin}/api/change-password`,
         method : "post"
     },
+    forgot_password: {
+        url: `${backendDomin}/api/forgot-password`,
+        method: "post"
+    },
+    reset_password: {
+        url: `${backendDomin}/api/reset-password`,
+        method: "post"
+    },
+    google_signIn: {
+        url: `${backendDomin}/api/auth/google`,
+        method: "get",
+    },
     uploadProduct : {
         url : `${backendDomin}/api/upload-product`,
         method : 'post'
@@ -44,6 +56,10 @@ const SummaryApi = {
     updateProduct : {
         url : `${backendDomin}/api/update-product`,
         method  : 'post'
+    },
+    sendIntroductNewProductMail: {
+        url: `${backendDomin}/api/introduct-new-product-mail`,
+        method: 'post',
     },
     categoryProduct : {
         url : `${backendDomin}/api/get-categoryProduct`,
@@ -141,7 +157,146 @@ const SummaryApi = {
     revenueSummary: {
         url : `${backendDomin}/api/revenue-summary`,
         method : 'get'
-    }
+    },
+    uploadNews : {
+        url : `${backendDomin}/api/upload-news`,
+        method : 'post'
+    },
+    allNews : {
+        url : `${backendDomin}/api/get-news`,
+        method : 'get'
+    },
+    newsDetails : {
+        url : `${backendDomin}/api/news-details`,
+        method : 'post'
+    },
+    allDiscount : {
+        url : `${backendDomin}/api/get-discount`,
+        method : 'get'
+    },
+    uploadDiscount : {
+        url : `${backendDomin}/api/upload-discount`,
+        method : 'post'
+    },
+    AddReview : {
+        url: `${backendDomin}/api/add`, 
+        method: 'post',
+    },
+    getReviews : {
+        url: `${backendDomin}/api/:productId`,
+        method: 'get',
+    },
+    allreview : {
+        url: `${backendDomin}/api/all-review`,
+        method: 'get',
+    },
+    newestProducts : {
+        url: `${backendDomin}/api/get-newestProduct`,
+        method: 'get',
+    },
+    updateStatusOrder: {
+        url: (orderId) => `${backendDomin}/api/updatestatus-order/${orderId}`, 
+        method: 'put',
+    },
+    getBestSellerProducts: {
+        url: (category) => {
+            return category 
+                ? `${backendDomin}/api/best-seller-products?category=${category}` 
+                : `${backendDomin}/api/best-seller-products`;
+        },
+        method: 'get',
+    },
+     createPost: {
+        url: `${backendDomin}/api/createPost`,
+        method: 'post',
+    },
+    updateStatus: {
+        url: (postId) => `${backendDomin}/api//postUser/${postId}/status`,
+        method: 'put',
+    },
+    deletePost: {
+        url: (Id) => `${backendDomin}/api/deletePost/${Id}`,
+        method: 'delete',
+    },
+    getAllPost: {
+        url: `${backendDomin}/api/getAllPost`,
+        method: 'get',
+    },
+    userInfo : {
+        url: `${backendDomin}/api/user-info`,
+        method: 'get',
+    },
+    checkOutOfStock: {
+        url: `${backendDomin}/api/check-out-of-stock`,
+        method: 'post',
+    },
+    applyDiscount: {
+        url: `${backendDomin}/api/apply-discount`,
+        method: 'post',
+    },
+    sendIntroductNewDiscountMail: {
+        url: `${backendDomin}/api/send-introduct-new-discount-mail`,
+        method: 'post',
+    },
+    allPreOrderProduct: {
+        url: `${backendDomin}/api/get-all-pre-order-product`,
+        method: 'get',
+    },
+    createPreOrderProduct: {
+        url: `${backendDomin}/api/create-pre-order-product`,
+    },
+    getLimitPreOrderProducts: {
+        url: `${backendDomin}/api/get-limit-pre-order-product`,
+        method: 'get'
+    },
+    preOrderProduct: {
+        url: `${backendDomin}/api/pre-order-product`,
+        method: 'post',
+    },
+    payDepositPreOrderProduct: {
+        url: `${backendDomin}/api/pay-deposit-pre-order-product`,
+        method: 'post',
+    },
+    updatePreOrder: {
+        url: `${backendDomin}/api/update-pre-order`,
+        method: 'put',
+    },
+    updateQuantityPreOrderProduct: {
+        url: `${backendDomin}/api/update-quantity-pre-order-product`,
+        method: 'post',
+    },
+    allPreOrder: {
+        url: `${backendDomin}/api/get-all-pre-order`,
+        method: 'get',
+    },
+    updatePreOrderProduct: {
+        url: `${backendDomin}/api/update-pre-order-product`,
+        method: 'post',
+    },
+        // create notification
+        createNotification: {
+            url: `${backendDomin}/api/create-notification`,
+            method: 'post',
+        },
+        // get notifications
+        getNotifications: {
+            url: (userId) => `${backendDomin}/api/notifications/${userId}`,
+            method: 'get',
+        },
+         // Mark notification as read
+         markNotificationAsRead: {
+            url: (notificationId) => `${backendDomin}/api/mark-notification-as-read/${notificationId}`,
+            method: 'put',
+        },
+        getProductReviews: {
+            url: `${backendDomin}/api/reviews`,
+            method: 'get'
+        },
+        deleteUser: {
+            url: `${backendDomin}/api/delete-user`,
+            method: 'delete'
+        },
+      
 }
 
 
