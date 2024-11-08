@@ -408,7 +408,7 @@ const Payment = () => {
   return (
     <form className="container-fluid mx-auto" onSubmit={handleSubmit}>
       <h1 style={styles.pagetitle} title="Giỏ hàng" itemprop="headline">
-        Giỏ hàng
+        Payment
       </h1>
       <div className="text-center text-lg my-3">
         {data.length === 0 && !loading && (

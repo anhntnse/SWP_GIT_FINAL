@@ -145,7 +145,7 @@ const Cart = () => {
   return (
     <div className="container-fluid mx-auto">
       <h1 style={styles.pagetitle} title="Giỏ hàng" itemProp="headline">
-        Giỏ hàng
+        Cart
       </h1>
       <div className="text-center text-lg my-3">
         {data.length === 0 && !loading && (
