@@ -6,7 +6,7 @@ import { toast } from 'react-toastify';
 import SummaryApi from '../common'; // Your API routes
 import Context from '../context';
 
-const EditProfile = ({userData }) => {
+const EditProfile = ({ userData }) => {
   const { fetchUserDetails } = useContext(Context);
 
   const [data, setData] = useState({
@@ -91,46 +91,52 @@ const EditProfile = ({userData }) => {
   };
 
   return (
-    <div className="">
-      <div className="bg-white p-4 rounded w-full max-w-2xl h-full max-h-[80%] overflow-hidden">
-        <div className="flex justify-between items-center pb-3">
-          <h2 className="font-bold text-lg">Edit Profile</h2>
+    <div className="top-0 left-0 right-0 bottom-0 flex justify-center items-center bg-gray-100 bg-opacity-70">
+      <div className="bg-white p-6 rounded-xl w-full max-w-lg shadow-lg">
+        <div className="text-center pb-4">
+          <h2 className="font-bold text-2xl text-gray-800">Edit Profile</h2>
         </div>
-        <form className="grid p-4 gap-2 overflow-y-scroll h-full pb-5" onSubmit={handleSubmit}>
-          <label htmlFor="name">Name:</label>
-          <input
-            type="text"
-            id="name"
-            placeholder="Enter your name"
-            name="name"
-            value={data.name}
-            onChange={handleOnChange}
-            className="p-2 bg-slate-100 border rounded"
-            required
-          />
+        <form className="space-y-6" onSubmit={handleSubmit}>
+          <div>
+            <label htmlFor="name" className="block text-sm font-semibold text-gray-700">Name:</label>
+            <input
+              type="text"
+              id="name"
+              placeholder="Enter your name"
+              name="name"
+              value={data.name}
+              onChange={handleOnChange}
+              className="w-full px-4 py-2 mt-2 bg-slate-100 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              required
+            />
+          </div>
 
-          <label htmlFor="email" className="mt-3">Email:</label>
-          <input
-            type="email"
-            id="email"
-            placeholder="Enter your email"
-            name="email"
-            value={data.email}
-            onChange={handleOnChange}
-            className="p-2 bg-slate-100 border rounded"
-            required
-          />
+          <div>
+            <label htmlFor="email" className="block text-sm font-semibold text-gray-700">Email:</label>
+            <input
+              type="email"
+              id="email"
+              placeholder="Enter your email"
+              name="email"
+              value={data.email}
+              onChange={handleOnChange}
+              className="w-full px-4 py-2 mt-2 bg-slate-100 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              required
+            />
+          </div>
 
-          <label htmlFor="profilePic" className="mt-3">Profile Picture:</label>
-          <label htmlFor="uploadImageInput">
-            <div className="p-2 bg-slate-100 border rounded h-32 w-full flex justify-center items-center cursor-pointer">
-              <div className="text-slate-500 flex justify-center items-center flex-col gap-2">
-                <span className="text-4xl"><FaCloudUploadAlt /></span>
-                <p className="text-sm">Upload Profile Picture</p>
-                <input type="file" id="uploadImageInput" className="hidden" onChange={handleUploadProfilePic} />
+          <div>
+            <label htmlFor="profilePic" className="block text-sm font-semibold text-gray-700">Profile Picture:</label>
+            <label htmlFor="uploadImageInput">
+              <div className="p-4 bg-slate-100 border rounded-lg h-40 w-full flex justify-center items-center cursor-pointer hover:bg-slate-200 transition duration-200 ease-in-out">
+                <div className="text-slate-500 flex justify-center items-center flex-col gap-2">
+                  <span className="text-4xl"><FaCloudUploadAlt /></span>
+                  <p className="text-sm">Upload Profile Picture</p>
+                  <input type="file" id="uploadImageInput" className="hidden" onChange={handleUploadProfilePic} />
+                </div>
               </div>
-            </div>
-          </label>
+            </label>
+          </div>
 
           {data.profilePic && (
             <div className="relative group">
@@ -139,7 +145,7 @@ const EditProfile = ({userData }) => {
                 alt="Profile"
                 width={80}
                 height={80}
-                className="bg-slate-100 border cursor-pointer"
+                className="bg-slate-100 border cursor-pointer rounded-full"
               />
               <div className="absolute bottom-0 right-0 p-1 text-white bg-gray-600 rounded-full hidden group-hover:block cursor-pointer" onClick={handleDeleteProfilePic}>
                 <MdDelete />
@@ -147,9 +153,13 @@ const EditProfile = ({userData }) => {
             </div>
           )}
 
-          <button className="px-3 py-2 bg-gray-600 text-white mb-10 hover:bg-red-700">Update Profile</button>
+          <button
+            type="submit"
+            className="w-full py-2 mt-6 text-white bg-indigo-600 rounded-lg focus:outline-none hover:bg-indigo-700"
+          >
+            Update Profile
+          </button>
         </form>
-
       </div>
     </div>
   );

@@ -1,18 +1,9 @@
-import React, { useState, useEffect, useContext } from "react";
-import { useNavigate, useLocation } from "react-router-dom";
+import React, { useState, useEffect } from "react";
 import { toast } from "react-toastify";
+import { EyeIcon, EyeOffIcon } from "@heroicons/react/outline";
 import SummaryApi from "../common";
-import Context from "../context"; // Assuming you have a context to fetch user details if needed
-import { EyeIcon, EyeOffIcon } from "@heroicons/react/outline"; // Import Heroicons
 
-const ChangePassword = () => {
-  const { fetchUserDetails } = useContext(Context);
-  const navigate = useNavigate();
-  const location = useLocation();
-
-  // Accessing the passed userData
-  const userData = location.state?.userData;
-
+const ChangePassword = ({ userData }) => {
   const [showPassword, setShowPassword] = useState({
     currentPassword: false,
     newPassword: false,
@@ -22,8 +13,9 @@ const ChangePassword = () => {
     currentPassword: "",
     newPassword: "",
     confirmNewPassword: "",
-    userId: userData?._id || "", // Ensure userId is available
+    userId: userData?._id || "",
   });
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
     setFormData({
@@ -43,14 +35,16 @@ const ChangePassword = () => {
   };
 
   const togglePasswordVisibility = (field) => {
-    setShowPassword({
-      ...showPassword,
-      [field]: !showPassword[field],
-    });
+    setShowPassword((prev) => ({
+      ...prev,
+      [field]: !prev[field],
+    }));
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (isSubmitting) return; // Prevent multiple submissions
+
     if (!formData.userId) {
       toast.error("User ID is missing");
       return;
@@ -61,6 +55,8 @@ const ChangePassword = () => {
       return;
     }
 
+    setIsSubmitting(true); // Set loading state
+
     try {
       const response = await fetch(SummaryApi.changePassword.url, {
         method: SummaryApi.changePassword.method,
@@ -68,115 +64,118 @@ const ChangePassword = () => {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(formData), // Send the full formData
+        body: JSON.stringify(formData),
       });
 
       const result = await response.json();
 
       if (result.success) {
         toast.success(result.message);
-        fetchUserDetails?.(); // Optionally refresh user details
-        navigate("/"); // Navigate after success
       } else {
         toast.error(result.message || "Failed to change password");
       }
     } catch (error) {
       toast.error("Error changing password");
       console.error("Password change error:", error);
+    } finally {
+      setIsSubmitting(false); // Reset loading state
     }
   };
 
   return (
-    <div className="fixed w-full h-full bg-slate-200 bg-opacity-35 top-0 left-0 right-0 bottom-0 flex justify-center items-center">
-      <div className="bg-white p-4 rounded w-full max-w-sm h-full max-h-[80%] overflow-hidden">
-        <div className="flex justify-between items-center pb-3">
-          <h2 className="font-bold text-lg">Change Password</h2>
+    <div className="top-10 left-0 right-0 bottom-0 flex justify-center items-center bg-gray-100 bg-opacity-70">
+      <div className="bg-white p-6 rounded-xl w-full max-w-md shadow-lg">
+        <div className="text-center pb-4">
+          <h2 className="font-bold text-2xl text-gray-800">Change Password</h2>
         </div>
-        <form
-          className="grid p-4 gap-2 overflow-y-scroll h-full pb-5"
-          onSubmit={handleSubmit}
-        >
-          <label htmlFor="currentPassword">Current Password:</label>
-          <div className="relative">
-            <input
-              type={showPassword.currentPassword ? "text" : "password"}
-              id="currentPassword"
-              name="currentPassword"
-              placeholder="Enter current password"
-              value={formData.currentPassword}
-              onChange={handleOnChange}
-              className="p-2 bg-slate-100 border rounded w-full"
-              required
-            />
-            <button
-              type="button"
-              className="absolute right-2 top-2 text-sm text-gray-600"
-              onClick={() => togglePasswordVisibility("currentPassword")}
-            >
-              {showPassword.currentPassword ? (
-                <EyeIcon className="h-5 w-5 text-gray-500" />
-              ) : (
-                <EyeOffIcon className="h-5 w-5 text-gray-500" />
-              )}
-            </button>
+        <form className="space-y-6" onSubmit={handleSubmit}>
+          <div>
+            <label htmlFor="currentPassword" className="block text-sm font-semibold text-gray-700">Current Password:</label>
+            <div className="relative">
+              <input
+                type={showPassword.currentPassword ? "text" : "password"}
+                id="currentPassword"
+                name="currentPassword"
+                placeholder="Enter current password"
+                value={formData.currentPassword}
+                onChange={handleOnChange}
+                className="w-full px-4 py-2 mt-2 bg-slate-100 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                required
+              />
+              <button
+                type="button"
+                className="absolute right-3 top-3 text-gray-500"
+                onClick={() => togglePasswordVisibility("currentPassword")}
+              >
+                {showPassword.currentPassword ? (
+                  <EyeIcon className="h-5 w-5" />
+                ) : (
+                  <EyeOffIcon className="h-5 w-5" />
+                )}
+              </button>
+            </div>
           </div>
 
-          <label htmlFor="newPassword" className="mt-3">
-            New Password:
-          </label>
-          <div className="relative">
-            <input
-              type={showPassword.newPassword ? "text" : "password"}
-              id="newPassword"
-              name="newPassword"
-              placeholder="Enter new password"
-              value={formData.newPassword}
-              onChange={handleOnChange}
-              className="p-2 bg-slate-100 border rounded w-full"
-              required
-            />
-            <button
-              type="button"
-              className="absolute right-2 top-2 text-sm text-gray-600"
-              onClick={() => togglePasswordVisibility("newPassword")}
-            >
-              {showPassword.newPassword ? (
-                <EyeIcon className="h-5 w-5 text-gray-500" />
-              ) : (
-                <EyeOffIcon className="h-5 w-5 text-gray-500" />
-              )}
-            </button>
+          <div>
+            <label htmlFor="newPassword" className="block text-sm font-semibold text-gray-700">New Password:</label>
+            <div className="relative">
+              <input
+                type={showPassword.newPassword ? "text" : "password"}
+                id="newPassword"
+                name="newPassword"
+                placeholder="Enter new password"
+                value={formData.newPassword}
+                onChange={handleOnChange}
+                className="w-full px-4 py-2 mt-2 bg-slate-100 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                required
+              />
+              <button
+                type="button"
+                className="absolute right-3 top-3 text-gray-500"
+                onClick={() => togglePasswordVisibility("newPassword")}
+              >
+                {showPassword.newPassword ? (
+                  <EyeIcon className="h-5 w-5" />
+                ) : (
+                  <EyeOffIcon className="h-5 w-5" />
+                )}
+              </button>
+            </div>
           </div>
 
-          <label htmlFor="confirmNewPassword" className="mt-3">
-            Confirm New Password:
-          </label>
-          <div className="relative">
-            <input
-              type={showPassword.confirmNewPassword ? "text" : "password"}
-              id="confirmNewPassword"
-              name="confirmNewPassword"
-              placeholder="Confirm new password"
-              value={formData.confirmNewPassword}
-              onChange={handleOnChange}
-              className="p-2 bg-slate-100 border rounded w-full"
-              required
-            />
-            <button
-              type="button"
-              className="absolute right-2 top-2 text-sm text-gray-600"
-              onClick={() => togglePasswordVisibility("confirmNewPassword")}
-            >
-              {showPassword.confirmNewPassword ? (
-                <EyeIcon className="h-5 w-5 text-gray-500" />
-              ) : (
-                <EyeOffIcon className="h-5 w-5 text-gray-500" />
-              )}
-            </button>
+          <div>
+            <label htmlFor="confirmNewPassword" className="block text-sm font-semibold text-gray-700">Confirm New Password:</label>
+            <div className="relative">
+              <input
+                type={showPassword.confirmNewPassword ? "text" : "password"}
+                id="confirmNewPassword"
+                name="confirmNewPassword"
+                placeholder="Confirm new password"
+                value={formData.confirmNewPassword}
+                onChange={handleOnChange}
+                className="w-full px-4 py-2 mt-2 bg-slate-100 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                required
+              />
+              <button
+                type="button"
+                className="absolute right-3 top-3 text-gray-500"
+                onClick={() => togglePasswordVisibility("confirmNewPassword")}
+              >
+                {showPassword.confirmNewPassword ? (
+                  <EyeIcon className="h-5 w-5" />
+                ) : (
+                  <EyeOffIcon className="h-5 w-5" />
+                )}
+              </button>
+            </div>
           </div>
 
-          <button className="px-3 py-2 bg-gray-600 text-white mb-10 hover:bg-red-700 mt-6">
-            Change Password
+          <button
+            type="submit"
+            disabled={isSubmitting}
+            className={`w-full py-2 mt-6 text-white bg-indigo-600 rounded-lg focus:outline-none hover:bg-indigo-700 ${isSubmitting ? "opacity-50 cursor-not-allowed" : ""}`}
+          >
+            {isSubmitting ? "Changing Password..." : "Change Password"}
           </button>
         </form>
       </div>
