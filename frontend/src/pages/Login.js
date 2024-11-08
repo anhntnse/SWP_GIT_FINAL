@@ -240,13 +240,6 @@ const Login = () => {
 
                         <button className='bg-gray-600 hover:bg-red-700 text-white px-6 py-2 w-full max-w-[150px] rounded-full hover:scale-110 transition-all mx-auto block mt-6'>Login</button>
                     </form>
-                    <div className='flex flex-col items-center mt-3'>
-                        <p className='mb-2'>Or sign in with </p>
-                        <div className='flex justify-center gap-3 text-white'>
-                            <button className='border-solid border-2 rounded-full p-3 bg-red-600 hover:bg-red-700 hover:scale-110 transition-all' onClick={() => handleOnClick('google')}><FaGoogle /></button>
-                            <button className='border-solid border-2 rounded-full p-3 bg-sky-900 hover:bg-sky-950 hover:scale-110 transition-all' onClick={() => handleOnClick('facebook')}><FaFacebookF /></button>
-                        </div>
-                    </div>
                     <p className='my-5'>Don't have an account? <Link to="/sign-up" className='text-red-600 hover:text-red-700 hover:underline'>Sign up</Link></p>
                 </div>
             </div>
