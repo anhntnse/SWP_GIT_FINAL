@@ -1,12 +1,14 @@
 import React, { useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import SummaryApi from "../common";
+import { useLocation } from 'react-router-dom';
+
 
 const PaymentSuccess = () => {
-  const [searchParams] = useSearchParams();
+  const location = useLocation();
+  const params = new URLSearchParams(location.search);
+  const _id = params.get('_id');
   const navigate = useNavigate();
-  const _id = searchParams.get("_id"); // Get the order ID from the URL
-
   const updateOrder = async () => {
     const body = {
       _id: _id,
