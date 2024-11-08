@@ -9,7 +9,7 @@ import SummaryApi from './common';
 import Context from './context';
 import { useDispatch } from 'react-redux';
 import { setUserDetails } from './store/userSlice';
-
+import Sidebar from './pages/Sidebar';
 
 function App() {
   const dispatch = useDispatch()
@@ -72,14 +72,15 @@ function App() {
           fetchUserAddToCart,
           fetchUserCreateOrder
       }}>
-        <ToastContainer 
-          position='top-center'
-        />
+      <ToastContainer position="top-center" />
+        <Header />
+        <div className="app-layout">
+          <Sidebar /> 
         
-        <Header/>
-        <main className='min-h-[calc(100vh-120px)] pt-16'>
-          <Outlet/>
-        </main>
+          <main className="main-content min-h-[calc(100vh-120px)] pt-16">
+            <Outlet />
+          </main>
+        </div>
       </Context.Provider>
     </>
   );
