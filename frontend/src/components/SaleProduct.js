@@ -22,7 +22,7 @@ function SaleProduct({ heading }) {
 
     const fetchData = async () => {
         setLoading(true)
-        const response = await fetch('https://swp-final-backend.onrender.com/api/get-limit-sale-products');
+        const response = await fetch('https://swp-final-backend.onrender.com/api/get-all-sale-products');
         const onSaleProduct = await response.json();
         setLoading(false)
 
