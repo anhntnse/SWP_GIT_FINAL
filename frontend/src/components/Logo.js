@@ -25,7 +25,7 @@ function Logo() {
   return (
     <div style={styles.container}>
       <img src={require('../assest/logoweb.webp')} alt="E-commerce Logo" style={styles.image} />
-      <h1 style={styles.title}>E-commerce</h1>
+      <h1 style={styles.title}>FUE E-commerce</h1>
     </div>
   );
 }

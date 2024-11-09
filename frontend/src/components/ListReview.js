@@ -4,15 +4,15 @@ import React from 'react';
 const ReviewList = ({ reviews }) => {
   return (
     <div className="review-list">
-      <h3>Các đánh giá:</h3>
+      <h3>All Reviews:</h3>
       {reviews.length === 0 ? (
-        <p>Chưa có đánh giá nào.</p>
+        <p>No reviews yet</p>
       ) : (
         <ul>
           {reviews.map((review) => (
             <li key={review._id} className="review-item">
               <div className="review-rating">
-                <span>Đánh giá: </span>
+                <span>Review: </span>
                 {[...Array(review.rating)].map((_, index) => (
                   <span key={index} className="star">★</span>
                 ))}
