@@ -244,6 +244,7 @@ const SummaryApi = {
     },
     createPreOrderProduct: {
         url: `${backendDomin}/api/create-pre-order-product`,
+        method: 'post',
     },
     getLimitPreOrderProducts: {
         url: `${backendDomin}/api/get-limit-pre-order-product`,
