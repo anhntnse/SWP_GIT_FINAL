@@ -19,7 +19,7 @@ const Cart = () => {
       },
       fontSize: "36px",
       fontWeight: "bold",
-      marginLeft: "100px",
+      marginLeft: "30px",
       marginTop: "100px",
       color: "#1d1f23",
       textAlign: "left",
@@ -147,8 +147,25 @@ const Cart = () => {
   return (
     <div className="container-fluid mx-auto">
       <h1 style={styles.pagetitle} title="Giỏ hàng" itemProp="headline">
-        Giỏ hàng
+        Cart
       </h1>
+      <p className="text-center my-2 discount-info">
+        For orders over 100,000, get a 10% shipping discount. For orders over
+        200,000, get a 25% shipping discount. For orders over 300,000, get a 50%
+        shipping discount. Orders over 500,000 receive free shipping.
+      </p>
+      <style>
+        {`
+            .discount-info {
+                font-size: 16px;
+                color: #ff5722; /* Bright color for emphasis */
+                padding: 10px;
+                border-radius: 5px;
+                margin-top: 10px;
+                text-align: center;
+            }
+        `}
+      </style>
       <div className="text-center text-lg my-3">
         {data.length === 0 && !loading && (
           <p className="bg-white py-5">No Data</p>

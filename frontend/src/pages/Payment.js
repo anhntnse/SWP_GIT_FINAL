@@ -31,7 +31,7 @@ const Payment = () => {
       },
       fontSize: "36px", // camelCase cho font-size
       fontWeight: "bold", // camelCase cho font-weight
-      marginLeft: "100px",
+      marginLeft: "30px",
       marginTop: "100px", // camelCase cho margin-bottom
       color: "#1d1f23", // Giá trị màu đặt trong dấu ngoặc kép
       textAlign: "left", // camelCase cho text-align
@@ -410,6 +410,23 @@ const Payment = () => {
       <h1 style={styles.pagetitle} title="Giỏ hàng" itemprop="headline">
         Payment
       </h1>
+      <p className="text-center my-2 discount-info">
+        For orders over 100,000, get a 10% shipping discount. For orders over
+        200,000, get a 25% shipping discount. For orders over 300,000, get a 50%
+        shipping discount. Orders over 500,000 receive free shipping.
+      </p>
+      <style>
+        {`
+            .discount-info {
+                font-size: 16px;
+                color: #ff5722; /* Bright color for emphasis */
+                padding: 10px;
+                border-radius: 5px;
+                margin-top: 10px;
+                text-align: center;
+            }
+        `}
+      </style>
       <div className="text-center text-lg my-3">
         {data.length === 0 && !loading && (
           <p className="bg-white py-5">No Data</p>
