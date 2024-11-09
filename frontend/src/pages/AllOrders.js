@@ -107,7 +107,7 @@ const AllOrders = () => {
     fetchAllOrders();
   }, []);
   const [currentPage, setCurrentPage] = useState(1);
-  const [ordersPerPage] = useState(30);
+  const [ordersPerPage] = useState(10);
 
   // Calculate pagination
   const indexOfLastOrder = currentPage * ordersPerPage;
@@ -143,9 +143,9 @@ const AllOrders = () => {
           </tr>
         </thead>
         <tbody>
-          {allOrder.map((el, index) => (
+          {currentOrders.map((el, index) => (
             <tr key={index}>
-              <td className="text-center">{index + 1}</td>
+              <td>{index + 1 + (currentPage - 1) * ordersPerPage}</td> {/* Adjust index for pagination */}
               <td className="text-center">
                 {el?.products && el.products.length > 0 ? (
                   el.products.map((product, idx) => (

@@ -275,7 +275,7 @@ const Payment = () => {
       amount: Math.ceil(totalPrice), // Total price calculated in createOrder
       description: "Thanh toan don hang", // Payment description
       items: items,
-      returnUrl: 'https://swp-git-final.onrender.com/payment-success?_id=${_id}', // Redirect URL after successful payment
+      returnUrl: `https://swp-git-final.onrender.com/payment-success?_id=${_id}`, // Redirect URL after successful payment
       cancelUrl: "https://swp-git-final.onrender.com", // Redirect URL after canceled payment
     };
 
@@ -408,7 +408,7 @@ const Payment = () => {
   return (
     <form className="container-fluid mx-auto" onSubmit={handleSubmit}>
       <h1 style={styles.pagetitle} title="Giỏ hàng" itemprop="headline">
-        Giỏ hàng
+        Payment
       </h1>
       <div className="text-center text-lg my-3">
         {data.length === 0 && !loading && (

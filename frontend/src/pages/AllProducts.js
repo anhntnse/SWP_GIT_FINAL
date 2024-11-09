@@ -9,7 +9,7 @@ const AllProducts = () => {
 
   // State for pagination
   const [currentPage, setCurrentPage] = useState(1);
-  const [productsPerPage] = useState(20); // Number of products per page
+  const [productsPerPage] = useState(10); // Number of products per page
 
   const fetchAllProduct = async () => {
     const response = await fetch(SummaryApi.allProduct.url);
@@ -29,11 +29,13 @@ const AllProducts = () => {
   const indexOfFirstProduct = indexOfLastProduct - productsPerPage;
   const currentProducts = allProduct.slice(indexOfFirstProduct, indexOfLastProduct);
 
-  // Calculate page numbers
-  const pageNumbers = [];
-  for (let i = 1; i <= Math.ceil(allProduct.length / productsPerPage); i++) {
-    pageNumbers.push(i);
-  }
+  // Calculate total pages
+  const totalPages = Math.ceil(allProduct.length / productsPerPage);
+
+  // Handler for page change
+  const handlePageChange = (pageNumber) => {
+    setCurrentPage(pageNumber);
+  };
 
   return (
     <div>
@@ -51,17 +53,15 @@ const AllProducts = () => {
       </div>
 
       {/* All products */}
-      <div className='flex items-center flex-wrap gap-5 py-4 h-[calc(100vh-190px)] overflow-hidden'>
+      <div className='flex items-center flex-wrap gap-5 py-4 h-[calc(100vh-190px)] overflow-y-auto'>
         {
-          currentProducts.map((product, index) => {
-            return (
-              <AdminProductCard
-                data={product}
-                key={index + "allProduct"}
-                fetchdata={fetchAllProduct}
-              />
-            );
-          })
+          currentProducts.map((product, index) => (
+            <AdminProductCard
+              data={product}
+              key={index + "allProduct"}
+              fetchdata={fetchAllProduct}
+            />
+          ))
         }
       </div>
 
@@ -77,10 +77,10 @@ const AllProducts = () => {
 
       {/* Pagination */}
       <div className='flex justify-center mt-4'>
-        {pageNumbers.map(number => (
+        {Array.from({ length: totalPages }, (_, i) => i + 1).map(number => (
           <button
             key={number}
-            onClick={() => setCurrentPage(number)}
+            onClick={() => handlePageChange(number)}
             className={`mx-1 px-3 py-1 border rounded ${currentPage === number ? 'bg-blue-500 text-white' : 'bg-white text-black'}`}
           >
             {number}

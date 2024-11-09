@@ -1,10 +1,18 @@
 const productModel = require('../../models/productModel');
+const addToCartModel = require('../../models/cartProduct'); // Import addToCart model
 
 async function deleteProduct(req, res) {
     try {
         const { productId } = req.params;
 
-        // Xóa sản phẩm
+        // Delete the product
+        await addToCartModel.deleteMany({ productId: null });
+
+        // Remove items from carts where the productId does not exist in the product collection
+        await addToCartModel.deleteMany({
+            productId: { $nin: await productModel.find().distinct('_id') }
+        });
+
         const deletedProduct = await productModel.findByIdAndDelete(productId);
 
         if (!deletedProduct) {
@@ -15,9 +23,11 @@ async function deleteProduct(req, res) {
             });
         }
 
-        // Trả về phản hồi
+        // Remove the deleted product from all user carts
+
+        // Respond to the client
         res.json({
-            message: "Product deleted successfully",
+            message: "Product deleted successfully and removed from all user carts",
             data: deletedProduct,
             success: true,
             error: false,

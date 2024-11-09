@@ -1,5 +1,6 @@
 const orderModel = require("../../models/orderModel");
 const productModel = require("../../models/productModel");
+const NotificationService = require("../notification/NotificationService");
 
 const updateOrderStatus = async (req, res) => {
     console.log("Updating order status...");
@@ -27,22 +28,10 @@ const updateOrderStatus = async (req, res) => {
             });
         }
 
-        // If order_status is "Shipped", update sold_quantity of each product in the order
-        if (order_status === "Shipped") {
-            const { products } = updatedOrderStatus;
-
-            // Loop through each product in the order and increment sold_quantity by 1
-            for (const product of products) {
-                await productModel.findByIdAndUpdate(
-                    product.product_id,
-                    { $inc: { sold_quantity: 1 } }
-                );
-            }
-        }
         // Send notification to the user about the status update
-        const userId = updatedOrder.userId; 
-        const orderCode = updatedOrder.orderCode;
-        const message = `Your order  ${orderCode} status has been updated to ${status}`;
+        const userId = updatedOrderStatus.userId; 
+        const orderCode = updatedOrderStatus.orderCode;
+        const message = `Your order  ${orderCode} status has been updated to ${order_status}`;
         await NotificationService.addNotificationToUser(userId, message);
 
         return res.status(200).json({

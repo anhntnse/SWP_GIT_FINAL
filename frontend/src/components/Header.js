@@ -1,8 +1,8 @@
-import React, { useContext, useState, useEffect } from "react";
+import React, { useContext, useState, useEffect, useRef } from "react";
 import Logo from "./Logo";
 import { GrSearch } from "react-icons/gr";
 import { FaRegCircleUser } from "react-icons/fa6";
-import { FaShoppingCart, FaBell  } from "react-icons/fa";
+import { FaShoppingCart, FaBell } from "react-icons/fa";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import SummaryApi from "../common";
@@ -22,6 +22,7 @@ const Header = () => {
   const searchQuery = URLSearch.getAll("q");
   const [search, setSearch] = useState(searchQuery);
   const [unreadNotifications, setUnreadNotifications] = useState(0);
+  const menuRef = useRef(null);
 
   const handleLogout = async () => {
     const fetchData = await fetch(SummaryApi.logout_user.url, {
@@ -75,6 +76,19 @@ const Header = () => {
     }
   }, [user]); // Fetch count when user logs in
 
+  // Close menu when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (menuRef.current && !menuRef.current.contains(event.target)) {
+        setMenuDisplay(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
+
   return (
     <header className="h-16 shadow-md bg-white fixed w-full z-40">
       <div className=" h-full container mx-auto flex items-center px-4 justify-between">
@@ -99,18 +113,18 @@ const Header = () => {
             className="w-full outline-none"
             onChange={handleSearch}
             value={search}
-          />{" "}
+          />
           <div className="text-lg min-w-[50px] h-10 bg-purple-600 flex items-center justify-center rounded-r-full text-white">
             <GrSearch />
           </div>
         </div>
 
         <div className="flex items-center gap-7">
-          <div className="relative flex justify-center">
+          <div className="relative flex justify-center" ref={menuRef}>
             {user?._id && (
               <div
                 className="text-3xl cursor-pointer relative flex justify-center"
-                onClick={() => setMenuDisplay((preve) => !preve)}
+                onClick={() => setMenuDisplay((prev) => !prev)}
               >
                 {user?.profilePic ? (
                   <img
@@ -131,23 +145,16 @@ const Header = () => {
                     <Link
                       to={"/admin-panel/all-products"}
                       className="whitespace-nowrap hidden md:block hover:bg-slate-100 p-2"
-                      onClick={() => setMenuDisplay((preve) => !preve)}
+                      onClick={() => setMenuDisplay(false)}
                     >
                       Admin Panel
                     </Link>
                   )}
-                </nav>
-              </div>
-            )}
-
-            {menuDisplay && (
-              <div className="absolute bg-white bottom-0 top-11 h-fit p-2 shadow-lg rounded">
-                <nav>
                   {user?.role === ROLE.GENERAL && (
                     <Link
                       to={"/user-panel"}
                       className="whitespace-nowrap hidden md:block hover:bg-slate-100 p-2"
-                      onClick={() => setMenuDisplay((preve) => !preve)}
+                      onClick={() => setMenuDisplay(false)}
                     >
                       User Panel
                     </Link>
@@ -162,7 +169,6 @@ const Header = () => {
               <span>
                 <FaShoppingCart />
               </span>
-
               <div className="bg-gray-600 text-white w-5 h-5 rounded-full p-1 flex items-center justify-center absolute -top-2 -right-3">
                 <p className="text-sm">{context?.cartProductCount}</p>
               </div>

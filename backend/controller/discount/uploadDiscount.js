@@ -31,7 +31,7 @@
 
 // module.exports = uploadDiscount;
 const Discount = require('../../models/discountModel');
-
+const NotificationService = require('../notification/NotificationService');
 async function uploadDiscount(req, res) {
   const { nameDiscount, codeDiscount, content, value, expirationDate } = req.body;
 
@@ -60,8 +60,9 @@ async function uploadDiscount(req, res) {
       value,
       expirationDate,
     });
-
     await newDiscount.save();
+    await NotificationService.createNotificationForAllUsers(`A new promotion ${nameDiscount} has been added! Your coupon code is ${codeDiscount}. Hurry up to apply and buy now!`
+);
     res.status(201).json({
       message: "Discount added successfully!",
       success: true,
