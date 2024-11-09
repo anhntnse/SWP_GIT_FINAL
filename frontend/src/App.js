@@ -10,6 +10,7 @@ import Context from './context';
 import { useDispatch } from 'react-redux';
 import { setUserDetails } from './store/userSlice';
 import Sidebar from './pages/Sidebar';
+import Footer from "./components/Footer";
 
 function App() {
   const dispatch = useDispatch()
@@ -80,6 +81,7 @@ function App() {
           <main className="main-content min-h-[calc(100vh-120px)] pt-16">
             <Outlet />
           </main>
+          <Footer/>
         </div>
       </Context.Provider>
     </>
